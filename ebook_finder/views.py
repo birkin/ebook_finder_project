@@ -11,6 +11,19 @@ from django.shortcuts import get_object_or_404, render
 log = logging.getLogger(__name__)
 
 
+def api_v1( request ):
+    """ Shows params. """
+    callnumber = request.GET.get( 'callnumber', '' )
+    title = request.GET.get( 'title', '' )
+    author = request.GET.get( 'author', '' )
+    jdct = {
+        'callnumber': callnumber,
+        'author': author,
+        'title': title }
+    ouput = json.dumps( jdct, sort_keys=True, indent=2 )
+    return HttpResponse( ouput, content_type=u'application/javascript; charset=utf-8' )
+
+
 def hi( request ):
     """ Returns simplest response. """
     now = datetime.datetime.now()
