@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 import datetime, json, logging, os, pprint
+import requests
 from django.conf import settings as project_settings
 from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
