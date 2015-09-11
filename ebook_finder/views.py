@@ -8,21 +8,36 @@ from django.contrib.auth import logout
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from ebook_finder.models import Processor
+
 
 log = logging.getLogger(__name__)
 
+processor = Processor()
+
 
 def api_v1( request ):
-    """ Shows params. """
-    callnumber = request.GET.get( 'callnumber', '' )
-    title = request.GET.get( 'title', '' )
-    author = request.GET.get( 'author', '' )
-    jdct = {
-        'callnumber': callnumber,
-        'author': author,
-        'title': title }
-    ouput = json.dumps( jdct, sort_keys=True, indent=2 )
-    return HttpResponse( ouput, content_type=u'application/javascript; charset=utf-8' )
+    """ Returns ebook info for given params. """
+    log.debug( 'starting' )
+    handler = processor.determine_handler(
+        callnumber=request.GET.get( 'callnumber', '' ),
+        title=request.GET.get( 'title', '' ),
+        author=request.GET.get( 'author', '' ) )
+    data_dct = processor.process_request( handler )
+    output = json.dumps( data_dct, sort_keys=True, indent=2 )
+    return HttpResponse( output, content_type=u'application/javascript; charset=utf-8' )
+
+# def api_v1( request ):
+#     """ Returns ebook info for given params. """
+#     callnumber = request.GET.get( 'callnumber', '' )
+#     title = request.GET.get( 'title', '' )
+#     author = request.GET.get( 'author', '' )
+#     jdct = {
+#         'callnumber': callnumber,
+#         'author': author,
+#         'title': title }
+#     output = json.dumps( jdct, sort_keys=True, indent=2 )
+#     return HttpResponse( output, content_type=u'application/javascript; charset=utf-8' )
 
 
 def hi( request ):

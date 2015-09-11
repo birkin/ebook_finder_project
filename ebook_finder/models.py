@@ -14,31 +14,80 @@ from django.utils.text import slugify
 log = logging.getLogger(__name__)
 
 
+class Processor( object ):
+    """ Manages processing. """
+
+    def determine_handler( self, callnumber, title, author ):
+        """ Determines which kind of query to run.
+            Called by views.api_v1() """
+        if callnumber is not '':
+            handler = { 'callnumber': callnumber }
+        elif title is not '' and author is '':
+            handler = { 'title': title }
+        elif title is not '' and author is not '':
+            handler = { 'title_and_author': {'title': title, 'author': author} }
+        else:
+            raise Exception( 'params problem' )
+        return handler
+
+    def process_request( self, handler ):
+        """ Manages processing flow.
+            Called by views.api_v1() """
+        slr = SolrAccessor()
+        if handler.keys()[0] == 'title':
+            params = slr.build_title_params( handler['title'] )
+        raw_data_dct = json.loads( slr.run_query(params) )
+        log.debug( 'raw_data_dct, ```%s```' % pprint.pformat(raw_data_dct) )
+        massaged_data_dct = self.massage_data( raw_data_dct )
+        return massaged_data_dct
+
+    def massage_data( self, raw_data_dct ):
+        """ Extracts required data from solr response.
+            Called by process_request() """
+        items = []
+        for raw_item in raw_data_dct['response']['docs']:
+            item = {}
+            item['title'] = raw_item['title_display']
+            item['url'] = raw_item['url_fulltext_display'][0]
+            item['author'] = raw_item.get( 'author_display', 'no_author_listed' )
+            items.append( item )
+        return items
+
+    # end class Processor
+
+
 class SolrAccessor( object ):
     """ Handles solr queries. """
 
     def __init__( self ):
         self.SOLR_URL = os.environ['EBK_FNDR__SOLR_URL']
-
-    def check_title( self, title ):
-        """ Makes solr title query. """
-        params = {
+        self.standard_params = {
             'sort': 'score desc, pub_date_sort desc, title_sort asc',
             'indent':'true',
             'wt':'json',
             'defType':'lucene',
             'rows':'10',
-            'q':'_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s"' % title,
+            'q':'',
             'f.author_facet.facet.limit':'21',
             'fq': ['{!raw f=format}Book', 'access_facet:("Online")'],
             }
+
+    def build_title_params( self, title ):
+        """ Makes title query params.
+            Called by Processor.process_request() """
+        params = self.standard_params.copy()
+        params['q'] = '_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s"' % title
+        return params
+
+    def run_query( self, params ):
+        """ Runs solr query & returns json.
+            Called by Processor.process_request() """
         r = requests.get( self.SOLR_URL, params=params )
         utf8_content = r.content
         print utf8_content
-        content = utf8_content.decode( 'utf-8' )
-        return content
+        return utf8_content
 
-    # def check_title( self ):
+    # def check_title( self, title ):
     #     """ Makes solr title query. """
     #     params = {
     #         'sort': 'score desc, pub_date_sort desc, title_sort asc',
@@ -46,7 +95,7 @@ class SolrAccessor( object ):
     #         'wt':'json',
     #         'defType':'lucene',
     #         'rows':'10',
-    #         'q':'_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}Zen-brain horizons : toward a living zen"',
+    #         'q':'_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s"' % title,
     #         'f.author_facet.facet.limit':'21',
     #         'fq': ['{!raw f=format}Book', 'access_facet:("Online")'],
     #         }
