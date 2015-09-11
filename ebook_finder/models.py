@@ -20,37 +20,17 @@ class SolrAccessor( object ):
     def __init__( self ):
         self.SOLR_URL = os.environ['EBK_FNDR__SOLR_URL']
 
-    def check_title( self ):
+    def check_title( self, title ):
         """ Makes solr title query. """
-        title = urlquote( 'Zen-brain horizons : toward a living zen' )
         params = {
-            'spellcheck': 'false',
-            'facet': 'true',
             'sort': 'score desc, pub_date_sort desc, title_sort asc',
             'indent':'true',
-            'stats':'true',
-            'f.language_facet.facet.limit':'21',
-            'f.topic_facet.facet.limit':'21',
             'wt':'json',
             'defType':'lucene',
             'rows':'10',
-            'stats.field':'pub_date',
-            # 'q':'_query_:'{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}Zen-brain horizons : toward a living zen'',
-            # 'q':'_query_:"%s"' % title,
-            'q':'_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}Zen-brain horizons : toward a living zen"',
+            'q':'_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s"' % title,
             'f.author_facet.facet.limit':'21',
-            'f.region_facet.facet.limit':'21',
-            # 'facet.field':['access_facet',
-            #   'format',
-            #   'author_facet',
-            #   'pub_date',
-            #   'topic_facet',
-            #   'region_facet',
-            #   'language_facet',
-            #   'building_facet'],
-            # 'fq':['{!raw f=format}Book', 'access_facet:(\'Online\')'],
             'fq': ['{!raw f=format}Book', 'access_facet:("Online")'],
-            'f.format.facet.limit':'11'
             }
         r = requests.get( self.SOLR_URL, params=params )
         utf8_content = r.content
@@ -58,29 +38,22 @@ class SolrAccessor( object ):
         content = utf8_content.decode( 'utf-8' )
         return content
 
-      # "spellcheck":"false",
-      # "facet":"true",
-      # "sort":"score desc, pub_date_sort desc, title_sort asc",
-      # "indent":"true",
-      # "stats":"true",
-      # "f.language_facet.facet.limit":"21",
-      # "f.topic_facet.facet.limit":"21",
-      # "wt":["json",
-      #   "ruby"],
-      # "defType":"lucene",
-      # "rows":"10",
-      # "stats.field":"pub_date",
-      # "q":"_query_:\"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}Zen-brain horizons : toward a living zen\"",
-      # "f.author_facet.facet.limit":"21",
-      # "f.region_facet.facet.limit":"21",
-      # "facet.field":["access_facet",
-      #   "format",
-      #   "author_facet",
-      #   "pub_date",
-      #   "topic_facet",
-      #   "region_facet",
-      #   "language_facet",
-      #   "building_facet"],
-      # "fq":["{!raw f=format}Book",
-      #   "access_facet:(\"Online\")"],
-      # "f.format.facet.limit":"11"}},
+    # def check_title( self ):
+    #     """ Makes solr title query. """
+    #     params = {
+    #         'sort': 'score desc, pub_date_sort desc, title_sort asc',
+    #         'indent':'true',
+    #         'wt':'json',
+    #         'defType':'lucene',
+    #         'rows':'10',
+    #         'q':'_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}Zen-brain horizons : toward a living zen"',
+    #         'f.author_facet.facet.limit':'21',
+    #         'fq': ['{!raw f=format}Book', 'access_facet:("Online")'],
+    #         }
+    #     r = requests.get( self.SOLR_URL, params=params )
+    #     utf8_content = r.content
+    #     print utf8_content
+    #     content = utf8_content.decode( 'utf-8' )
+    #     return content
+
+    # end class SolrAccessor

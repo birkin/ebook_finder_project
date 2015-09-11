@@ -15,5 +15,5 @@ class SolrAccessorTest( TestCase ):
         """ Tests title solr query. """
         self.assertEqual(
             'foo',
-            slr.check_title()
+            slr.check_title( 'Zen-brain horizons : toward a living zen' )
             )
