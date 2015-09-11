@@ -86,6 +86,7 @@ class SolrAccessor( object ):
             Called by Processor.process_request() """
         params = self.standard_params.copy()
         params['q'] = '_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s"' % title
+        # params['q'] = requests.utils.quote( '_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s"' % title, safe='_:"' )
         return params
 
     def build_title_and_author_params( self, title_author_dct ):
@@ -94,13 +95,14 @@ class SolrAccessor( object ):
         title = title_author_dct['title']
         author = title_author_dct['author']
         params = self.standard_params.copy()
-        params['q'] = 'q=_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s" AND _query_:"{!dismax spellcheck.dictionary=author qf=$author_qf pf=$author_pf}%s"' % ( title, author )
+        params['q'] = '_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s" AND _query_:"{!dismax spellcheck.dictionary=author qf=$author_qf pf=$author_pf}%s"' % ( title, author )
         return params
 
     def run_query( self, params ):
         """ Runs solr query & returns json.
             Called by Processor.process_request() """
         r = requests.get( self.SOLR_URL, params=params )
+        log.debug( 'solr_url, `%s`' % r.url )
         utf8_content = r.content
         print utf8_content
         return utf8_content
