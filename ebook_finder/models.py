@@ -36,21 +36,25 @@ class Processor( object ):
     def process_request( self, handler ):
         """ Manages processing flow.
             Called by views.api_v1() """
-        # slr = SolrAccessor()
         params = self.build_params( handler )
+        if params is None:
+            return []
         raw_data_dct = json.loads( self.slr.run_query(params) )
         log.debug( 'raw_data_dct, ```%s```' % pprint.pformat(raw_data_dct) )
-        massaged_data_dct = self.massage_data( raw_data_dct )
-        return massaged_data_dct
+        massaged_data = self.massage_data( raw_data_dct )
+        return massaged_data
 
     def build_params( self, handler ):
         """ Manages params building.
             Called by process_request() """
-        # slr = SolrAccessor()
-        if handler.keys()[0] == 'title':
+        handler_key = handler.keys()[0]
+        if handler_key == 'title':
             params = self.slr.build_title_params( handler['title'] )
-        elif handler.keys()[0] == 'title_and_author':
+        elif handler_key == 'title_and_author':
             params = self.slr.build_title_and_author_params( handler['title_and_author'] )
+        else:
+            callnumber_title_author_dct = self.slr.query_callnumber( handler['callnumber'] )
+            params = self.slr.build_title_and_author_params( callnumber_title_author_dct )
         return params
 
     def massage_data( self, raw_data_dct ):
@@ -89,23 +93,46 @@ class SolrAccessor( object ):
             Called by Processor.process_request() """
         params = self.standard_params.copy()
         params['q'] = '_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s"' % title
-        # params['q'] = requests.utils.quote( '_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s"' % title, safe='_:"' )
         return params
 
     def build_title_and_author_params( self, title_author_dct ):
         """ Makes title query params.
             Called by Processor.process_request() """
+        if title_author_dct is None:  # callnumber lookup returned nothing
+            log.debug( 'returning None' )
+            return None
         title = title_author_dct['title']
         author = title_author_dct['author']
         params = self.standard_params.copy()
         params['q'] = '_query_:"{!dismax spellcheck.dictionary=title qf=$title_qf pf=$title_pf}%s" AND _query_:"{!dismax spellcheck.dictionary=author qf=$author_qf pf=$author_pf}%s"' % ( title, author )
         return params
 
+    def query_callnumber( self, callnumber ):
+        """ Tries to get title and author from callnumber; returns title/author dct.
+            Called by Processor.build_params() """
+        # http://plibsolrcit.services.brown.edu:8081/solr/blacklight-core/select?q=callnumber_t%3A%27BQ9288+.A966+2014&wt=json&indent=true
+        callnumber_dct = None
+        params = {
+            'q': "callnumber_t:'%s'" % callnumber,
+            'wt': 'json',
+            'indent': 'true' }
+        r = requests.get( self.SOLR_URL, params=params )
+        log.debug( 'callnumber solr_url, `%s`' % r.url )
+        raw_dct = json.loads( r.content )
+        if raw_dct['response']['numFound'] > 0:
+            doc = raw_dct['response']['docs'][0]
+            author = doc.get( 'author_display', '' )
+            callnumber_dct = {
+                'title': doc.get( 'title_display', '' ),
+                'author': author.split( ',' )[0] }
+        log.debug( 'callnumber_dct, `%s`' % callnumber_dct )
+        return callnumber_dct
+
     def run_query( self, params ):
         """ Runs solr query & returns json.
             Called by Processor.process_request() """
         r = requests.get( self.SOLR_URL, params=params )
-        log.debug( 'solr_url, `%s`' % r.url )
+        log.debug( 'full solr_url, `%s`' % r.url )
         utf8_content = r.content
         return utf8_content
 
