@@ -104,7 +104,6 @@ class SolrAccessor( object ):
         r = requests.get( self.SOLR_URL, params=params )
         log.debug( 'solr_url, `%s`' % r.url )
         utf8_content = r.content
-        print utf8_content
         return utf8_content
 
     # end class SolrAccessor
