@@ -17,8 +17,11 @@ log = logging.getLogger(__name__)
 class Processor( object ):
     """ Manages processing. """
 
+    def __init__( self ):
+        self.slr = SolrAccessor()
+
     def determine_handler( self, callnumber, title, author ):
-        """ Determines which kind of query to run.
+        """ Determines which kind of query to run, and populates dct.
             Called by views.api_v1() """
         if callnumber is not '':
             handler = { 'callnumber': callnumber }
@@ -33,9 +36,9 @@ class Processor( object ):
     def process_request( self, handler ):
         """ Manages processing flow.
             Called by views.api_v1() """
-        slr = SolrAccessor()
+        # slr = SolrAccessor()
         params = self.build_params( handler )
-        raw_data_dct = json.loads( slr.run_query(params) )
+        raw_data_dct = json.loads( self.slr.run_query(params) )
         log.debug( 'raw_data_dct, ```%s```' % pprint.pformat(raw_data_dct) )
         massaged_data_dct = self.massage_data( raw_data_dct )
         return massaged_data_dct
@@ -43,11 +46,11 @@ class Processor( object ):
     def build_params( self, handler ):
         """ Manages params building.
             Called by process_request() """
-        slr = SolrAccessor()
+        # slr = SolrAccessor()
         if handler.keys()[0] == 'title':
-            params = slr.build_title_params( handler['title'] )
+            params = self.slr.build_title_params( handler['title'] )
         elif handler.keys()[0] == 'title_and_author':
-            params = slr.build_title_and_author_params( handler['title_and_author'] )
+            params = self.slr.build_title_and_author_params( handler['title_and_author'] )
         return params
 
     def massage_data( self, raw_data_dct ):

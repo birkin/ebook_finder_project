@@ -27,18 +27,6 @@ def api_v1( request ):
     output = json.dumps( data_dct, sort_keys=True, indent=2 )
     return HttpResponse( output, content_type=u'application/javascript; charset=utf-8' )
 
-# def api_v1( request ):
-#     """ Returns ebook info for given params. """
-#     callnumber = request.GET.get( 'callnumber', '' )
-#     title = request.GET.get( 'title', '' )
-#     author = request.GET.get( 'author', '' )
-#     jdct = {
-#         'callnumber': callnumber,
-#         'author': author,
-#         'title': title }
-#     output = json.dumps( jdct, sort_keys=True, indent=2 )
-#     return HttpResponse( output, content_type=u'application/javascript; charset=utf-8' )
-
 
 def hi( request ):
     """ Returns simplest response. """
