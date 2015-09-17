@@ -33,7 +33,7 @@ class Processor( object ):
             raise Exception( 'params problem' )
         return handler
 
-    def process_request( self, handler ):
+    def process_request( self, verbosity, handler ):
         """ Manages processing flow.
             Called by views.api_v1() """
         params = self.build_params( handler )
@@ -41,8 +41,19 @@ class Processor( object ):
             return []
         raw_data_dct = json.loads( self.slr.run_query(params) )
         log.debug( 'raw_data_dct, ```%s```' % pprint.pformat(raw_data_dct) )
-        massaged_data = self.massage_data( raw_data_dct )
+        massaged_data = self.massage_data( verbosity, raw_data_dct )
         return massaged_data
+
+    # def process_request( self, handler ):
+    #     """ Manages processing flow.
+    #         Called by views.api_v1() """
+    #     params = self.build_params( handler )
+    #     if params is None:
+    #         return []
+    #     raw_data_dct = json.loads( self.slr.run_query(params) )
+    #     log.debug( 'raw_data_dct, ```%s```' % pprint.pformat(raw_data_dct) )
+    #     massaged_data = self.massage_data( raw_data_dct )
+    #     return massaged_data
 
     def build_params( self, handler ):
         """ Manages params building.
@@ -57,7 +68,7 @@ class Processor( object ):
             params = self.slr.build_title_and_author_params( callnumber_title_author_dct )
         return params
 
-    def massage_data( self, raw_data_dct ):
+    def massage_data( self, verbosity, raw_data_dct ):
         """ Extracts required data from solr response.
             Called by process_request() """
         items = []
@@ -66,8 +77,23 @@ class Processor( object ):
             item['title'] = raw_item['title_display']
             item['url'] = raw_item['url_fulltext_display'][0]
             item['author'] = raw_item.get( 'author_display', 'no_author_listed' )
+            if verbosity == 'full' or verbosity == 'full/':
+                item['pub_date'] = raw_item.get( 'pub_date', '' )
+                item['language'] = raw_item.get( 'language_facet', '' )
             items.append( item )
         return items
+
+    # def massage_data( self, raw_data_dct ):
+    #     """ Extracts required data from solr response.
+    #         Called by process_request() """
+    #     items = []
+    #     for raw_item in raw_data_dct['response']['docs']:
+    #         item = {}
+    #         item['title'] = raw_item['title_display']
+    #         item['url'] = raw_item['url_fulltext_display'][0]
+    #         item['author'] = raw_item.get( 'author_display', 'no_author_listed' )
+    #         items.append( item )
+    #     return items
 
     def build_response( self, request, handler_dct, data_dct ):
         """ Builds response json.
