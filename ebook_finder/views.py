@@ -24,8 +24,20 @@ def api_v1( request ):
         title=request.GET.get( 'title', '' ),
         author=request.GET.get( 'author', '' ) )
     data_dct = processor.process_request( handler )
-    output = json.dumps( data_dct, sort_keys=True, indent=2 )
+    output = processor.build_response( request, handler, data_dct )
     return HttpResponse( output, content_type=u'application/javascript; charset=utf-8' )
+
+
+# def api_v1( request ):
+#     """ Returns ebook info for given params. """
+#     log.debug( 'starting' )
+#     handler = processor.determine_handler(
+#         callnumber=request.GET.get( 'callnumber', '' ),
+#         title=request.GET.get( 'title', '' ),
+#         author=request.GET.get( 'author', '' ) )
+#     data_dct = processor.process_request( handler )
+#     output = json.dumps( data_dct, sort_keys=True, indent=2 )
+#     return HttpResponse( output, content_type=u'application/javascript; charset=utf-8' )
 
 
 def hi( request ):

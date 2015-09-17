@@ -69,6 +69,19 @@ class Processor( object ):
             items.append( item )
         return items
 
+    def build_response( self, request, handler_dct, data_dct ):
+        """ Builds response json.
+            Called by views.api_v1() """
+        url = '%s://%s/%s' % ( request.scheme, request.META['SERVER_NAME'], request.path )
+        query_string = request.META['QUERY_STRING']
+        if query_string is not None:
+            url = '%s/?%s' % ( url, query_string )
+        request_dct = {
+            'url': url, 'params_used': handler_dct, 'datetime': unicode( datetime.datetime.now() ) }
+        response_dct = { 'request': request_dct, 'response': data_dct }
+        output = json.dumps( response_dct, sort_keys=True, indent=2 )
+        return output
+
     # end class Processor
 
 
@@ -110,21 +123,15 @@ class SolrAccessor( object ):
     def query_callnumber( self, callnumber ):
         """ Tries to get title and author from callnumber; returns title/author dct.
             Called by Processor.build_params() """
-        # http://plibsolrcit.services.brown.edu:8081/solr/blacklight-core/select?q=callnumber_t%3A%27BQ9288+.A966+2014&wt=json&indent=true
         callnumber_dct = None
-        params = {
-            'q': "callnumber_t:'%s'" % callnumber,
-            'wt': 'json',
-            'indent': 'true' }
+        params = { 'q': "callnumber_t:'%s'" % callnumber, 'wt': 'json', 'indent': 'true' }
         r = requests.get( self.SOLR_URL, params=params )
         log.debug( 'callnumber solr_url, `%s`' % r.url )
         raw_dct = json.loads( r.content )
         if raw_dct['response']['numFound'] > 0:
             doc = raw_dct['response']['docs'][0]
             author = doc.get( 'author_display', '' )
-            callnumber_dct = {
-                'title': doc.get( 'title_display', '' ),
-                'author': author.split( ',' )[0] }
+            callnumber_dct = { 'title': doc.get( 'title_display', '' ), 'author': author.split( ',' )[0] }
         log.debug( 'callnumber_dct, `%s`' % callnumber_dct )
         return callnumber_dct
 
