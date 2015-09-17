@@ -72,10 +72,10 @@ class Processor( object ):
     def build_response( self, request, handler_dct, data_dct ):
         """ Builds response json.
             Called by views.api_v1() """
-        url = '%s://%s/%s' % ( request.scheme, request.META['SERVER_NAME'], request.path )
+        url = '%s://%s%s' % ( request.scheme, request.META['SERVER_NAME'], request.path )
         query_string = request.META['QUERY_STRING']
         if query_string is not None:
-            url = '%s/?%s' % ( url, query_string )
+            url = '%s?%s' % ( url, query_string )
         request_dct = {
             'url': url, 'params_used': handler_dct, 'datetime': unicode( datetime.datetime.now() ) }
         response_dct = { 'request': request_dct, 'response': data_dct }
