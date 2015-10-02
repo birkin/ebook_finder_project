@@ -122,7 +122,7 @@ LOGGING = {
         'logfile': {
             'level':'DEBUG',
             'class':'logging.FileHandler',  # note: configure server to use system's log-rotate to avoid permissions issues
-            'filename': os.environ.get(u'EBK_FNDR__LOG_PATH'),
+            'filename': os.environ.get( 'EBK_FNDR__LOG_PATH' ),
             'formatter': 'standard',
         },
         'console':{
@@ -134,7 +134,7 @@ LOGGING = {
     'loggers': {
         'ebook_finder': {
             'handlers': ['logfile'],
-            'level': os.environ.get(u'EBK_FNDR__LOG_LEVEL'),
+            'level': os.environ.get( 'EBK_FNDR__LOG_LEVEL' ),
         },
     }
 }

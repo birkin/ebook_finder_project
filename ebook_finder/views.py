@@ -25,7 +25,8 @@ def api_v1( request, verbosity ):
         author=request.GET.get( 'author', '' ) )
     data_dct = processor.process_request( verbosity, handler )
     output = processor.build_response( request, handler, data_dct )
-    return HttpResponse( output, content_type=u'application/javascript; charset=utf-8' )
+    # return HttpResponse( output, content_type='application/javascript; charset=utf-8' )
+    return HttpResponse( output, content_type='application/json; charset=utf-8' )
 
 
 def hi( request ):

@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import unicode_literals
+import os, pprint, sys
+
 """
 WSGI config for ebook_finder_project.
 
@@ -17,18 +22,17 @@ stuff
     env_ebook
 """
 
-import os, pprint, sys
 
 
 ## become self-aware, padawan
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 ## vars
-ACTIVATE_FILE = os.path.abspath( u'%s/../../env_ebook/bin/activate_this.py' % current_directory )
-PROJECT_DIR = os.path.abspath( u'%s/../../ebook_finder_project' % current_directory )
-PROJECT_ENCLOSING_DIR = os.path.abspath( u'%s/../..' % current_directory )
-SETTINGS_MODULE = u'config.settings'
-SITE_PACKAGES_DIR = os.path.abspath( u'%s/../../env_ebook/lib/python2.7/site-packages' % current_directory )
+ACTIVATE_FILE = os.path.abspath( '%s/../../env_ebook/bin/activate_this.py' % current_directory )
+PROJECT_DIR = os.path.abspath( '%s/../../ebook_finder_project' % current_directory )
+PROJECT_ENCLOSING_DIR = os.path.abspath( '%s/../..' % current_directory )
+SETTINGS_MODULE = 'config.settings'
+SITE_PACKAGES_DIR = os.path.abspath( '%s/../../env_ebook/lib/python2.7/site-packages' % current_directory )
 
 ## virtualenv
 execfile( ACTIVATE_FILE, dict(__file__=ACTIVATE_FILE) )
@@ -39,7 +43,7 @@ for entry in [PROJECT_DIR, PROJECT_ENCLOSING_DIR, SITE_PACKAGES_DIR]:
    sys.path.append( entry )
 
 ## environment additions
-os.environ[u'DJANGO_SETTINGS_MODULE'] = SETTINGS_MODULE  # so django can access its settings
+os.environ['DJANGO_SETTINGS_MODULE'] = SETTINGS_MODULE  # so django can access its settings
 
 ## load up env vars
 SETTINGS_FILE = os.environ['EBK_FNDR__SETTINGS_PATH']  # set in activate_this.py, and activated above
