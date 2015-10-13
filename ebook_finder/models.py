@@ -50,21 +50,6 @@ class Processor( object ):
             params = self.slr.build_title_and_author_params( callnumber_title_author_dct )
         return params
 
-    # def massage_data( self, verbosity, raw_data_dct ):
-    #     """ Extracts required data from solr response.
-    #         Called by process_request() """
-    #     items = []
-    #     for raw_item in raw_data_dct['response']['docs']:
-    #         item = {}
-    #         item['title'] = raw_item['title_display']
-    #         item['url'] = raw_item['url_fulltext_display'][0]
-    #         item['author'] = raw_item.get( 'author_display', 'no_author_listed' )
-    #         if verbosity == 'full' or verbosity == 'full/':
-    #             item['pub_date'] = raw_item.get( 'pub_date', '' )
-    #             item['language'] = raw_item.get( 'language_facet', '' )
-    #         items.append( item )
-    #     return items
-
     def massage_data( self, verbosity, raw_data_dct ):
         """ Extracts required data from solr response.
             Called by process_request() """
