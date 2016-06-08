@@ -148,3 +148,20 @@ class SolrAccessor( object ):
         return utf8_content
 
     # end class SolrAccessor
+
+
+class CatalogAccessor( object ):
+    """ Handles catalog queries. """
+
+    def __init__( self ):
+        self.CATALOG_URL = 'https://search.library.brown.edu/catalog.json'
+        self.standard_params = {
+            'utf8': '✓',
+            'op': 'AND',
+            'f_inclusive[format][]': 'Book',
+            'sort': 'score desc, pub_date_sort desc, title_sort asc',
+            'search_field': 'advanced',
+            'commit': 'Search',
+            # 'title': 'The union of the oceans'
+            # 'author': 'Kelley'
+            }
