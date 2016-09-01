@@ -12,6 +12,7 @@ class Processor( object ):
 
     def __init__( self ):
         self.slr = SolrAccessor()
+        self.cat = CatalogAccessor()
 
     def determine_handler( self, callnumber, title, author ):
         """ Determines which kind of query to run, and populates dct.
@@ -37,6 +38,19 @@ class Processor( object ):
         massaged_data = self.massage_data( verbosity, raw_data_dct )
         log.debug( 'massaged_data, ```%s```' % pprint.pformat(massaged_data) )
         return massaged_data
+
+    def process_requestv2( self, verbosity, handler ):
+        """ Manages processing flow.
+            Called by views.api_v2() """
+        params = self.build_params( handler )
+        if params is None:
+            return []
+        # raw_data_dct = json.loads( self.slr.run_query(params) )
+        # log.debug( 'raw_data_dct, ```%s```' % pprint.pformat(raw_data_dct) )
+        # massaged_data = self.massage_data( verbosity, raw_data_dct )
+        # log.debug( 'massaged_data, ```%s```' % pprint.pformat(massaged_data) )
+        # return massaged_data
+        return None
 
     def build_params( self, handler ):
         """ Manages params building.
