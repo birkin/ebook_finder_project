@@ -113,7 +113,7 @@ class SolrAccessor( object ):
         return params
 
     def build_title_and_author_params( self, title_author_dct ):
-        """ Makes title query params.
+        """ Makes title/author query params.
             Called by Processor.process_request() """
         if title_author_dct is None:  # callnumber lookup returned nothing
             log.debug( 'returning None' )
