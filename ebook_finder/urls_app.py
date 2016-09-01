@@ -11,6 +11,8 @@ urlpatterns = patterns('',
 
     url( r'^api/v1/(?P<verbosity>.*)$',  'ebook_finder.views.api_v1', name='api_v1_url' ),
 
+    url( r'^api/v2/(?P<verbosity>.*)$',  'ebook_finder.views.api_v2', name='api_v2_url' ),
+
     url( r'^$',  RedirectView.as_view(pattern_name='info_url') ),
 
     )
