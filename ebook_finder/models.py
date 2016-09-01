@@ -55,6 +55,8 @@ class Processor( object ):
             Called by process_request() """
         items = []
         for raw_item in raw_data_dct['response']['docs']:
+            if not 'url_fulltext_display' in raw_item.keys():
+                continue
             item = self.make_basic_item( raw_item )
             if verbosity == 'full' or verbosity == 'full/':
                 item['pub_date'] = raw_item.get( 'pub_date', '' )
@@ -71,6 +73,28 @@ class Processor( object ):
         item['author'] = raw_item.get( 'author_display', 'no_author_listed' )
         item['bib'] = raw_item['id']
         return item
+
+    # def massage_data( self, verbosity, raw_data_dct ):
+    #     """ Extracts required data from solr response.
+    #         Called by process_request() """
+    #     items = []
+    #     for raw_item in raw_data_dct['response']['docs']:
+    #         item = self.make_basic_item( raw_item )
+    #         if verbosity == 'full' or verbosity == 'full/':
+    #             item['pub_date'] = raw_item.get( 'pub_date', '' )
+    #             item['language'] = raw_item.get( 'language_facet', '' )
+    #         items.append( item )
+    #     return items
+
+    # def make_basic_item( self, raw_item ):
+    #     """ Initializes basic item-dict.
+    #         Called by massage_data() """
+    #     item = {}
+    #     item['title'] = raw_item['title_display']
+    #     item['url'] = raw_item['url_fulltext_display'][0]
+    #     item['author'] = raw_item.get( 'author_display', 'no_author_listed' )
+    #     item['bib'] = raw_item['id']
+    #     return item
 
     def build_response( self, request, handler_dct, data_dct ):
         """ Builds response json.
