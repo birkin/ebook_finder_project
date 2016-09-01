@@ -3,10 +3,19 @@
 from __future__ import unicode_literals
 
 from django.test import TestCase
-from ebook_finder.models import SolrAccessor
+from ebook_finder.models import Processor
+# from ebook_finder.models import SolrAccessor
 
-
+prcssr = Processor()
 # slr = SolrAccessor()
+
+
+class ProcessorTest( TestCase ):
+    """ Tests models.Processor() """
+
+    def test_massage_data( self ):
+        """ Checks parse of solr response. """
+        self.assertEqual( 1, 2 )
 
 
 # class SolrAccessorTest( TestCase ):
@@ -22,3 +31,5 @@ from ebook_finder.models import SolrAccessor
 #             'foo',
 #             utf8_jsn
 #             )
+
+
