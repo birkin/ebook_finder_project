@@ -35,6 +35,7 @@ class Processor( object ):
         raw_data_dct = json.loads( self.slr.run_query(params) )
         log.debug( 'raw_data_dct, ```%s```' % pprint.pformat(raw_data_dct) )
         massaged_data = self.massage_data( verbosity, raw_data_dct )
+        log.debug( 'massaged_data, ```%s```' % pprint.pformat(massaged_data) )
         return massaged_data
 
     def build_params( self, handler ):
@@ -56,6 +57,7 @@ class Processor( object ):
         items = []
         for raw_item in raw_data_dct['response']['docs']:
             if not 'url_fulltext_display' in raw_item.keys():
+                log.debug( 'no `url_fulltext_display` key found; skipping entry' )
                 continue
             item = self.make_basic_item( raw_item )
             if verbosity == 'full' or verbosity == 'full/':
