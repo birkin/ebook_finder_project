@@ -135,7 +135,7 @@ LOGGING = {
         'ebook_finder': {
             'handlers': ['logfile'],
             'level': os.environ.get( 'EBK_FNDR__LOG_LEVEL' ),
-            'propogate': False
+            'propagate': False
         },
     }
 }
